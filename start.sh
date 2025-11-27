@@ -5,6 +5,9 @@ set -e
 echo "Running database migrations..."
 python manage.py migrate --noinput
 
+echo "Creating superuser (if needed)..."
+python create_superuser.py || true
+
 echo "Collecting static files..."
 python manage.py collectstatic --noinput || true
 
