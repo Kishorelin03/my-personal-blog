@@ -14,10 +14,10 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-# Get credentials from environment variables
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'admin')
-ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'admin@example.com')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'changeme123')
+# Get credentials from environment variables (or use defaults)
+ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME', 'aruldha')
+ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL', 'aruldha@uwindsor.ca')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Arulmabel@95')
 
 # Create superuser if it doesn't exist
 if not User.objects.filter(username=ADMIN_USERNAME).exists():
