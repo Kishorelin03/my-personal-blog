@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact - KishorelinBlog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3">{{ contact_page.title }}</h1>
+                {% if contact_page.subtitle %}
+                <p class="lead text-muted">{{ contact_page.subtitle }}</p>
+                {% endif %}
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body p-5">
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label">Your Name *</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.email.id_for_label }}" class="form-label">Your Email *</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">Subject *</label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                            <div class="text-danger small">{{ form.subject.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.message.id_for_label }}" class="form-label">Message *</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}
+                            <div class="text-danger small">{{ form.message.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-send"></i> Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row mt-5">
+                {% if contact_page.email_value %}
+                <div class="col-md-4 text-center mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="bi bi-envelope text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="mt-3">{{ contact_page.email_label|default:"Email" }}</h5>
+                            <p class="text-muted mb-0">{{ contact_page.email_value }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if contact_page.github_url %}
+                <div class="col-md-4 text-center mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="bi bi-github text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="mt-3">{{ contact_page.github_label|default:"GitHub" }}</h5>
+                            <p class="text-muted mb-0">
+                                {% if contact_page.github_value %}
+                                    {{ contact_page.github_value }}
+                                {% else %}
+                                    <a href="{{ contact_page.github_url }}" target="_blank" class="text-decoration-none">View Profile</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if contact_page.linkedin_url %}
+                <div class="col-md-4 text-center mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="bi bi-linkedin text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="mt-3">{{ contact_page.linkedin_label|default:"LinkedIn" }}</h5>
+                            <p class="text-muted mb-0">
+                                {% if contact_page.linkedin_value %}
+                                    {{ contact_page.linkedin_value }}
+                                {% else %}
+                                    <a href="{{ contact_page.linkedin_url }}" target="_blank" class="text-decoration-none">View Profile</a>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

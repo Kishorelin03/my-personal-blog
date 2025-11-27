@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} - KishorelinBlog{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Blog Post -->
+            <article class="reading-content">
+                <!-- Cover Image -->
+                {% if post.cover_image %}
+                <div class="mb-4 blog-detail-cover" style="overflow: hidden; border-radius: 16px; max-width: 100%;">
+                    <img src="{{ post.cover_image.url }}" class="img-fluid rounded" alt="{{ post.title }}" style="width: 100%; height: 400px; display: block; object-fit: cover; object-position: center;">
+                </div>
+                {% endif %}
+
+                <!-- Post Header -->
+                <header class="mb-4">
+                    {% if post.category %}
+                    <span class="badge bg-secondary mb-2">{{ post.category.name }}</span>
+                    {% endif %}
+                    {% if post.is_featured %}
+                    <span class="badge bg-warning mb-2">Featured</span>
+                    {% endif %}
+                    <h1 class="display-4 fw-bold mb-3">{{ post.title }}</h1>
+                    <div class="d-flex flex-wrap align-items-center text-muted mb-3">
+                        <span class="me-4">
+                            <i class="bi bi-calendar"></i> {{ post.created_at|date:"F d, Y" }}
+                        </span>
+                        <span class="me-4">
+                            <i class="bi bi-eye"></i> {{ post.view_count }} views
+                        </span>
+                        <span class="me-4">
+                            <i class="bi bi-chat-dots"></i> {{ post.get_comment_count }} comments
+                        </span>
+                        <span>
+                            <i class="bi bi-heart"></i> <span id="likeCount">{{ like_count }}</span> likes
+                        </span>
+                    </div>
+                    
+                    <!-- Tags -->
+                    {% if post.tags.all %}
+                    <div class="mb-3">
+                        {% for tag in post.tags.all %}
+                        <a href="{% url 'blog_list' %}?tag={{ tag.slug }}" class="tag-badge text-decoration-none">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </header>
+
+                <!-- Post Content -->
+                <div class="post-content mb-5" style="overflow-wrap: break-word; word-wrap: break-word; max-width: 100%;">
+                    {{ post.content|safe }}
+                </div>
+                
+                <!-- Initialize Prism.js after content loads -->
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        if (typeof Prism !== 'undefined') {
+                            Prism.highlightAll();
+                        }
+                    });
+                </script>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mb-5 flex-wrap">
+                    <button type="button" class="btn btn-outline-danger" id="likeBtn" data-post-slug="{{ post.slug }}">
+                        <i class="bi bi-heart"></i> <span id="likeText">{% if user_liked %}Liked{% else %}Like{% endif %}</span>
+                    </button>
+                    {% if user.is_authenticated %}
+                    <button type="button" class="btn btn-outline-primary" id="saveBtn" data-post-slug="{{ post.slug }}">
+                        <i class="bi bi-bookmark"></i> <span id="saveText">{% if user_saved %}Saved{% else %}Save{% endif %}</span>
+                    </button>
+                    {% endif %}
+                    {% if user.is_authenticated and user.is_staff %}
+                    <a href="{% url 'post_edit' post.id %}" class="btn btn-outline-success">
+                        <i class="bi bi-pencil"></i> Edit Post
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Related Posts -->
+                {% if related_posts %}
+                <div class="border-top pt-4 mt-5">
+                    <h3 class="mb-4">Related Posts</h3>
+                    <div class="row">
+                        {% for related_post in related_posts %}
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                {% if related_post.cover_image %}
+                                <img src="{{ related_post.cover_image.url }}" class="card-img-top" alt="{{ related_post.title }}" style="height: 150px; object-fit: cover;">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <a href="{% url 'blog_detail' related_post.slug %}" class="text-decoration-none">{{ related_post.title }}</a>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Comments Section -->
+                <div class="border-top pt-4 mt-5">
+                    <h3 class="mb-4">
+                        <i class="bi bi-chat-dots"></i> Comments ({{ comments.count }})
+                    </h3>
+
+                    <!-- Comment Form -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="POST">
+                                {% csrf_token %}
+                                {{ comment_form.as_p }}
+                                <button type="submit" class="btn btn-primary mt-2">
+                                    <i class="bi bi-send"></i> Submit Comment
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Comments List -->
+                    {% for comment in comments %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1">{{ comment.name }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar"></i> {{ comment.created_at|date:"M d, Y h:i A" }}
+                                        {% if not comment.is_approved %}
+                                        <span class="badge bg-warning ms-2">Pending Approval</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                {% if user.is_authenticated and user.is_staff %}
+                                <form method="POST" action="{% url 'delete_comment' comment.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Comment">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            <p class="mb-0">{{ comment.text|linebreaks }}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No comments yet. Be the first to comment!</p>
+                    {% endfor %}
+                </div>
+            </article>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Post Info</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <strong>Published:</strong><br>
+                        {{ post.published_at|date:"F d, Y"|default:"Not published yet" }}
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Views:</strong> {{ post.view_count }}
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Likes:</strong> <span id="sidebarLikeCount">{{ like_count }}</span>
+                    </div>
+                    <div class="list-group-item">
+                        <strong>Comments:</strong> {{ post.get_comment_count }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get CSRF token function
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    // Get CSRF token
+    const csrftoken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    
+    // Like functionality
+    document.getElementById('likeBtn').addEventListener('click', function() {
+        const slug = this.dataset.postSlug;
+        fetch(`/blog/${slug}/like/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('likeCount').textContent = data.like_count;
+            document.getElementById('sidebarLikeCount').textContent = data.like_count;
+            const likeText = document.getElementById('likeText');
+            if (data.liked) {
+                likeText.textContent = 'Liked';
+                document.getElementById('likeBtn').classList.add('btn-danger');
+                document.getElementById('likeBtn').classList.remove('btn-outline-danger');
+            } else {
+                likeText.textContent = 'Like';
+                document.getElementById('likeBtn').classList.remove('btn-danger');
+                document.getElementById('likeBtn').classList.add('btn-outline-danger');
+            }
+        });
+    });
+
+    // Save functionality (requires authentication)
+    {% if user.is_authenticated %}
+    const saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', function() {
+            const slug = this.dataset.postSlug;
+            fetch(`/blog/${slug}/save/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                },
+            })
+        .then(response => response.json())
+        .then(data => {
+            const saveText = document.getElementById('saveText');
+            if (data.saved) {
+                saveText.textContent = 'Saved';
+                document.getElementById('saveBtn').classList.add('btn-primary');
+                document.getElementById('saveBtn').classList.remove('btn-outline-primary');
+            } else {
+                saveText.textContent = 'Save';
+                document.getElementById('saveBtn').classList.remove('btn-primary');
+                document.getElementById('saveBtn').classList.add('btn-outline-primary');
+            }
+        });
+    });
+    }
+    {% endif %}
+</script>
+{% endblock %}
+

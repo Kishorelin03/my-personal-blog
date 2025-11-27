@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block title %}About - KishorelinBlog{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Responsive About Page */
+    @media (max-width: 767.98px) {
+        .about-page {
+            padding: 1.5rem 0;
+        }
+        
+        .about-page .card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .about-page .card-body {
+            padding: 1.5rem !important;
+        }
+        
+        .about-page .profile-image,
+        .about-page .bg-primary {
+            width: 120px !important;
+            height: 120px !important;
+        }
+        
+        .about-page h1 {
+            font-size: 2rem;
+        }
+        
+        .about-page h2 {
+            font-size: 1.5rem;
+        }
+        
+        .about-page h3 {
+            font-size: 1.25rem;
+        }
+        
+        .about-stats .col-md-4 {
+            margin-bottom: 1rem;
+        }
+        
+        .about-stats .display-4 {
+            font-size: 2rem !important;
+        }
+        
+        .social-links-wrapper {
+            flex-direction: column;
+            align-items: stretch !important;
+        }
+        
+        .social-links-wrapper .btn {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .about-page h1 {
+            font-size: 1.75rem;
+        }
+        
+        .about-stats .display-4 {
+            font-size: 1.75rem !important;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5 about-page">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3">{{ about_page.title }}</h1>
+                {% if about_page.subtitle %}
+                <p class="lead text-muted">{{ about_page.subtitle }}</p>
+                {% endif %}
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        {% if about_page.profile_image %}
+                        <img src="{{ about_page.profile_image.url }}" alt="{{ about_page.name }}" class="rounded-circle" style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 150px; height: 150px;">
+                            <i class="bi bi-person" style="font-size: 4rem; color: white;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h2 class="text-center mb-4">Hello, I'm {{ about_page.name }}</h2>
+                    
+                    <div class="lead">
+                        {{ about_page.bio|linebreaks }}
+                    </div>
+                    
+                    {% if topics_list %}
+                    <h3 class="mt-5 mb-3">What I Write About</h3>
+                    <ul class="list-unstyled">
+                        {% for topic in topics_list %}
+                        <li><i class="bi bi-check-circle text-primary me-2"></i> {{ topic }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+
+                        <div class="row mt-5 text-center about-stats">
+                            <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2 class="display-4 fw-bold text-primary">{{ total_posts }}</h2>
+                                    <p class="text-muted mb-0">Blog Posts</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2 class="display-4 fw-bold text-primary">{{ total_views|default:0 }}</h2>
+                                    <p class="text-muted mb-0">Total Views</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h2 class="display-4 fw-bold text-primary">{{ total_likes|default:0 }}</h2>
+                                    <p class="text-muted mb-0">Total Likes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                <div class="text-center mt-5 mb-5">
+                    <h3 class="mb-4">Let's Connect</h3>
+                    <div class="d-flex flex-wrap justify-content-center gap-2 social-links-wrapper" style="max-width: 100%; overflow-wrap: break-word;">
+                    {% if about_page.github_url %}
+                    <a href="{{ about_page.github_url }}" target="_blank" class="btn btn-outline-primary mb-2">
+                        <i class="bi bi-github"></i> GitHub
+                    </a>
+                    {% endif %}
+                    {% if about_page.linkedin_url %}
+                    <a href="{{ about_page.linkedin_url }}" target="_blank" class="btn btn-outline-info mb-2">
+                        <i class="bi bi-linkedin"></i> LinkedIn
+                    </a>
+                    {% endif %}
+                    {% if about_page.twitter_url %}
+                    <a href="{{ about_page.twitter_url }}" target="_blank" class="btn btn-outline-secondary mb-2">
+                        <i class="bi bi-twitter"></i> Twitter
+                    </a>
+                    {% endif %}
+                    {% if about_page.email %}
+                    <a href="mailto:{{ about_page.email }}" class="btn btn-primary mb-2">
+                        <i class="bi bi-envelope"></i> Contact Me
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
