@@ -36,16 +36,12 @@ DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Allow hosts from environment variable, default to localhost for development
 allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',') if host.strip()]
 
-# Automatically allow Render domains
-# Render sets RENDER_EXTERNAL_HOSTNAME or we can check for onrender.com
+# Automatically allow Render domains (Render sets RENDER_EXTERNAL_HOSTNAME)
 render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-if render_host:
+if render_host and render_host not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(render_host)
-    # Also allow wildcard for all Render subdomains
-    if '.onrender.com' not in str(ALLOWED_HOSTS):
-        ALLOWED_HOSTS.append('*.onrender.com')
 
 
 # Application definition
