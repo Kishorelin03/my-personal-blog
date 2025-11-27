@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: kishorelinblog
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
+    startCommand: gunicorn KishorelinBlog.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+    healthCheckPath: /
+
+databases:
+  - name: kishorelinblog-db
+    plan: free
+    databaseName: kishorelinblog
+    user: kishorelinblog
+
