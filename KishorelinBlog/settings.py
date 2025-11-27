@@ -35,7 +35,17 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-$u!n32-!h-617%=zu#t)l
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 # Allow hosts from environment variable, default to localhost for development
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+
+# Automatically allow Render domains
+# Render sets RENDER_EXTERNAL_HOSTNAME or we can check for onrender.com
+render_host = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if render_host:
+    ALLOWED_HOSTS.append(render_host)
+    # Also allow wildcard for all Render subdomains
+    if '.onrender.com' not in str(ALLOWED_HOSTS):
+        ALLOWED_HOSTS.append('*.onrender.com')
 
 
 # Application definition
