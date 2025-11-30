@@ -12,6 +12,16 @@ if [ -z "$DATABASE_URL" ]; then
     echo "⚠️  On Render, you MUST create a PostgreSQL database and connect it to this service."
     echo "⚠️  Using SQLite as fallback (DATA WILL BE LOST ON RESTART/DEPLOY!)"
     echo ""
+    echo "🔍 DEBUG: All environment variables containing 'DATABASE':"
+    env | grep -i database || echo "   (none found)"
+    echo ""
+else
+    # Mask password in output
+    MASKED_URL=$(echo "$DATABASE_URL" | sed 's/:[^:@]*@/:****@/')
+    echo "✅ DATABASE_URL is set"
+    echo "🔍 DEBUG: DATABASE_URL (masked) = $MASKED_URL"
+    echo "🔍 DEBUG: DATABASE_URL length = ${#DATABASE_URL}"
+    echo ""
 fi
 
 echo "Checking database connection..."

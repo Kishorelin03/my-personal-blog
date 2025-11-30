@@ -101,6 +101,19 @@ DATABASE_URL = os.environ.get('DATABASE_URL')
 # On Render free tier, SQLite files get wiped on every deploy/restart!
 IS_RENDER = os.environ.get('RENDER') == 'true' or os.environ.get('RENDER_EXTERNAL_HOSTNAME') is not None
 
+# Debug: Print environment info (only on Render)
+if IS_RENDER:
+    print(f"🔍 DEBUG: IS_RENDER = {IS_RENDER}")
+    print(f"🔍 DEBUG: DATABASE_URL exists = {bool(DATABASE_URL)}")
+    print(f"🔍 DEBUG: DATABASE_URL length = {len(DATABASE_URL) if DATABASE_URL else 0}")
+    print(f"🔍 DEBUG: dj_database_url available = {dj_database_url is not None}")
+    if DATABASE_URL:
+        # Mask password in logs
+        masked_url = DATABASE_URL.split('@')[0].split(':')[:2]
+        if len(masked_url) >= 2:
+            masked_url[1] = '***'
+        print(f"🔍 DEBUG: DATABASE_URL (masked) = {'@'.join(masked_url)}@{DATABASE_URL.split('@')[1] if '@' in DATABASE_URL else '***'}")
+
 if DATABASE_URL and dj_database_url:
     # Production: Use PostgreSQL from DATABASE_URL
     DATABASES = {

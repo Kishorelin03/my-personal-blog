@@ -15,9 +15,9 @@ services:
       - key: ALLOWED_HOSTS
         sync: false
       - key: DATABASE_URL
-        fromDatabase:
-          name: kishorelinblog-db
-          property: connectionString
+        sync: false
+        # If you have a database service named kishorelinblog-db, Render will auto-set this
+        # Otherwise, set DATABASE_URL manually in the Environment tab with your connection string
     healthCheckPath: /
 
 databases:
