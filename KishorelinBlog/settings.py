@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',  # Cloudinary storage backend (must come before django.contrib.staticfiles)
+    'cloudinary',  # Cloudinary for image management
     'django.contrib.staticfiles',
     'rest_framework',  # Django REST Framework
     'corsheaders',  # CORS headers
@@ -193,8 +195,36 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (for file uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+# Use Cloudinary in production (Render) to persist images, local storage for development
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', ''),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY', ''),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET', ''),
+}
+
+# Check if Cloudinary credentials are set (production)
+USE_CLOUDINARY = bool(
+    IS_RENDER and 
+    os.environ.get('CLOUDINARY_CLOUD_NAME') and 
+    os.environ.get('CLOUDINARY_API_KEY') and 
+    os.environ.get('CLOUDINARY_API_SECRET')
+)
+
+if USE_CLOUDINARY:
+    # Production: Use Cloudinary for media files (persistent storage)
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+    print("✅ Using Cloudinary for media file storage (images will persist)")
+else:
+    # Development or Cloudinary not configured: Use local storage
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+    if IS_RENDER:
+        print("⚠️  WARNING: Using local filesystem for media files!")
+        print("⚠️  Images will be LOST when the instance spins down!")
+        print("⚠️  Please set CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET environment variables.")
+    else:
+        print("ℹ️  Using local filesystem for media files (development mode)")
 
 # Login URLs
 LOGIN_URL = '/login/'  # URL to redirect to if user needs to login
