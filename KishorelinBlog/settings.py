@@ -97,6 +97,10 @@ WSGI_APPLICATION = 'KishorelinBlog.wsgi.application'
 # Use DATABASE_URL environment variable if available (for production), otherwise use SQLite (for development)
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
+# Check if we're on Render (production) - should use PostgreSQL
+# On Render free tier, SQLite files get wiped on every deploy/restart!
+IS_RENDER = os.environ.get('RENDER') == 'true' or os.environ.get('RENDER_EXTERNAL_HOSTNAME') is not None
+
 if DATABASE_URL and dj_database_url:
     # Production: Use PostgreSQL from DATABASE_URL
     DATABASES = {
@@ -105,6 +109,22 @@ if DATABASE_URL and dj_database_url:
             conn_max_age=600,
             conn_health_checks=True,
         )
+    }
+    # Log which database we're using (only in production with DEBUG=False)
+    if IS_RENDER and not DEBUG:
+        print("✅ Using PostgreSQL database from DATABASE_URL")
+        print(f"   Database: {DATABASES['default'].get('NAME', 'N/A')}")
+elif IS_RENDER:
+    # CRITICAL: On Render, we MUST use PostgreSQL, not SQLite!
+    # SQLite files are ephemeral and get wiped on every restart/deploy
+    print("⚠️  WARNING: Running on Render but DATABASE_URL not found!")
+    print("⚠️  Please create a PostgreSQL database and set DATABASE_URL environment variable.")
+    print("⚠️  Using SQLite as fallback (DATA WILL BE LOST ON DEPLOY/RESTART!)")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
 else:
     # Development: Use SQLite

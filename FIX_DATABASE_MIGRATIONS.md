@@ -68,3 +68,4 @@ After redeploy:
 
 The error shows SQLite because `DATABASE_URL` environment variable is not set. Once you set it, Django will automatically use PostgreSQL instead of SQLite.
 
+

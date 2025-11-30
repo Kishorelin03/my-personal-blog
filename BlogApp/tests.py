@@ -81,3 +81,4 @@ class LikeModelTest(TestCase):
         self.assertEqual(like.post, self.post)
         self.assertEqual(like.session_id, 'test_session_123')
 
+

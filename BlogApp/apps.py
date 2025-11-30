@@ -6,3 +6,4 @@ class BlogappConfig(AppConfig):
     name = 'BlogApp'
     verbose_name = 'Blog App'
 
+

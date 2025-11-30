@@ -85,3 +85,4 @@ Try accessing `/admin` - if migrations ran, Django might allow you to create a u
 
 **Just trigger a manual deploy from the Events tab** - that's the easiest way to run migrations on the free tier!
 
+

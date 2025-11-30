@@ -10,3 +10,4 @@ echo "  python manage.py runserver"
 echo ""
 echo "To deactivate, run: deactivate"
 
+

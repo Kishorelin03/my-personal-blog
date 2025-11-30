@@ -65,3 +65,4 @@ The file now includes:
 
 This means migrations will run automatically on every deployment!
 
+

@@ -49,3 +49,4 @@ Or use wildcard:
 
 The `settings.py` now automatically detects Render domains using `RENDER_EXTERNAL_HOSTNAME` environment variable that Render sets automatically. This means you don't need to manually update `ALLOWED_HOSTS` every time Render assigns a new subdomain.
 
+
